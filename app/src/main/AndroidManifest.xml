@@ -7,9 +7,10 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -19,13 +20,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.maps.maps.MarkerActivity"
+            android:name="com.maps.maps.activities.MarkerActivity"
             android:label="@string/title_activity_marker"
-            android:parentActivityName="com.maps.maps.MapsActivity"
+            android:parentActivityName="com.maps.maps.activities.MapsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.maps.maps.MapsActivity" />
+                android:value="com.maps.maps.activities.MapsActivity" />
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -40,7 +41,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.maps.maps.MapsActivity"
+            android:name="com.maps.maps.activities.MapsActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

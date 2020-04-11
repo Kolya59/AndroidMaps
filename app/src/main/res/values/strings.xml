@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Maps</string>
+    <string name="log_tag">MapsApp</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_marker">MarkerActivity</string>
     <string name="button">Button</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="capture">Capture</string>
 </resources>
