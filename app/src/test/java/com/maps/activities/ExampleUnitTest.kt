@@ -1,4 +1,4 @@
-package com.maps.maps
+package com.maps.activities
 
 import org.junit.Test
 

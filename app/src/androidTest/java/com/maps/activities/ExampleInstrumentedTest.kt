@@ -1,4 +1,4 @@
-package com.maps.maps
+package com.maps.activities
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

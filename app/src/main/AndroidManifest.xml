@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.maps.maps">
+    package="com.maps.activities">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -20,13 +20,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.maps.maps.activities.MarkerActivity"
+            android:name="com.maps.activities.MarkerActivity"
             android:label="@string/title_activity_marker"
-            android:parentActivityName="com.maps.maps.activities.MapsActivity"
+            android:parentActivityName="com.maps.activities.MapsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.maps.maps.activities.MapsActivity" />
+                android:value="com.maps.activities.MapsActivity" />
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -41,7 +41,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.maps.maps.activities.MapsActivity"
+            android:name="com.maps.activities.MapsActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.maps.maps.activities
+package com.maps.activities
 
 import android.Manifest
 import android.content.Context
@@ -18,12 +18,10 @@ import android.util.Log
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.maps.maps.R
 import kotlinx.android.synthetic.main.activity_marker.*
 import java.io.*
 import java.nio.ByteBuffer
@@ -59,7 +57,8 @@ open class MarkerActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         cameraPreview = findViewById(R.id.cameraPreviewTextureView)
-        cameraPreview.surfaceTextureListener = TextureListener { openCamera() }
+        cameraPreview.surfaceTextureListener =
+            TextureListener { openCamera() }
 
         takePictureButton = findViewById(R.id.buttonCapture)
         takePictureButton.setOnClickListener { takePicture() }
@@ -339,7 +338,8 @@ open class MarkerActivity : AppCompatActivity() {
         if (cameraPreviewTextureView.isAvailable) {
             openCamera()
         } else {
-            cameraPreviewTextureView.surfaceTextureListener = TextureListener {openCamera()}
+            cameraPreviewTextureView.surfaceTextureListener =
+                TextureListener { openCamera() }
         }
     }
 
