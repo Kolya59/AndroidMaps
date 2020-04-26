@@ -3,8 +3,12 @@ package com.maps.models
 import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import java.util.*
 
 open class Dot : RealmObject() {
+    @PrimaryKey
+    var id: String = UUID.randomUUID().toString()
     private var lat: Double = 0.0
     private var lng: Double = 0.0
     private var path: String = ""

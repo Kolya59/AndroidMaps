@@ -2,80 +2,60 @@ package com.maps.store
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.maps.models.Dot
 import io.realm.Realm
 import io.realm.RealmResults
-import java.util.*
 
 class Store(context: Context) {
-    private lateinit var realm: Realm
-    private val logTag = "store"
+    private var mRealm: Realm
 
     init {
         Realm.init(context)
-        this.realm = Realm.getDefaultInstance()
+        mRealm = Realm.getDefaultInstance()
     }
 
-    // Закрытие соединения
     fun close() {
-        if (checkConnectionOpening()) {
-            this.realm.close()
-        }
+        if (checkConnectionOpening()) { mRealm.close() }
     }
 
-    // Запрос всех маркеров
     fun findAllMarkers(): RealmResults<Dot>? {
-        if (!checkConnectionOpening()) { return null }
-        return try {
-            this.realm.where(Dot::class.java).findAll()
-        } catch (e: Exception) {
-            Log.e(logTag, "Find markers failed: ${e.message}")
-            null
-        }
+        return if (checkConnectionOpening()) {
+            mRealm.where(Dot::class.java).findAll()
+        } else null
     }
 
-    // Создание маркера
+    fun findMarker(position: LatLng?): Dot? {
+        return if (checkConnectionOpening() && position != null) {
+            mRealm.where(Dot::class.java)
+                .equalTo("lat", position.latitude)
+                .equalTo("lng", position.longitude)
+                .findFirst()
+        } else null
+    }
+
     fun createMarker(position: LatLng) {
         if (!checkConnectionOpening()) {return}
-        try {
-            this.realm.executeTransaction {
-                val dot = Dot()
-                dot.setLatLng(position)
-                this.realm.copyToRealm(dot)
-            }
-        }
-        catch(e: Exception) {
-            Log.e(logTag, "Creating marker failed: ${e.message}")
+        mRealm.executeTransaction {
+            val dot = Dot()
+            dot.setLatLng(position)
+            this.mRealm.copyToRealm(dot)
         }
     }
 
-    // Обновление фото маркера
-    fun updateMarkerImage(position: LatLng, uri: Uri?) {
+    fun updateMarkerUri(dot: Dot, uri: Uri) {
         if (!checkConnectionOpening()) {return}
-        try {
-            this.realm.executeTransaction {
-                val dot = this.realm.where(Dot::class.java)
-                    .equalTo("lat", position.latitude)
-                    .equalTo("lng", position.longitude)
-                    .findFirst()
-                if (dot == null) {
-                    Log.e(logTag, "Marker not found")
-                    return@executeTransaction
-                }
-                if (uri != null) {
-                    dot.setURI(uri)
-                }
-            }
-        }
-        catch(ex :Exception) {
-            Log.e(logTag, "Updating marker error: ${ex.message}")
+        this.mRealm.executeTransaction {
+            val updated = mRealm.where(Dot::class.java)
+                .equalTo("lat", dot.getLatLng().latitude)
+                .equalTo("lng", dot.getLatLng().longitude)
+                .findFirst()
+            updated!!.setURI(uri)
+            mRealm.copyToRealmOrUpdate(updated)
         }
     }
 
-    // Проверка открытия соединения
     private fun checkConnectionOpening(): Boolean {
-        return !this.realm.isClosed
+        return !this.mRealm.isClosed
     }
 }

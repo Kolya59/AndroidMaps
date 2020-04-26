@@ -24,14 +24,16 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.maps.models.Dot
 import com.maps.store.Store
 
 class MapsActivity :
     AppCompatActivity(),
-    OnMapReadyCallback
-{
+    OnMapReadyCallback,
+    GoogleMap.OnMapClickListener,
+    GoogleMap.OnMarkerClickListener {
     private lateinit var mMap: GoogleMap
     private lateinit var mStore: Store
     private lateinit var mLocationClient: FusedLocationProviderClient
@@ -49,33 +51,43 @@ class MapsActivity :
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.setOnMapClickListener(this)
+        mMap.setOnMarkerClickListener(this)
 
         mStore.findAllMarkers()?.forEach { mMap.addMarker(MarkerOptions().position(it.getLatLng())) }
 
-        if (!requestStoragePermissions() ||
-            !requestLocationPermissions()
-        ) {
-            Log.e(getString(R.string.log_tag), "Required permissions not granted")
+        if (!requestStoragePermissions()) {
+            Log.e(getString(R.string.log_tag), "Required storage permissions not granted")
+            finish()
+        }
+
+        if (!requestLocationPermissions()) {
+            Log.e(getString(R.string.log_tag), "Required location permissions not granted")
             finish()
         }
 
         mLocationClient = LocationServices.getFusedLocationProviderClient(this)
         subscribeForLocationChanging()
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(58.008215, 56.1870133)))
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == resources.getInteger(R.integer.permission_location_id)) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                subscribeForLocationChanging()
-            }
+    override fun onMapClick(position: LatLng?) {
+        position?.let { mStore.createMarker(it) }
+        mMap.addMarker(position?.let { MarkerOptions().position(it) })
+    }
+
+    override fun onMarkerClick(marker: Marker?): Boolean {
+        if (marker != null) {
+            val intent = Intent(this, MarkerActivity::class.java)
+            intent.putExtra("key", marker.position)
+            startActivity(intent)
+            return true
         }
+        return false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == resources.getInteger(R.integer.location_req_code) && isLocationEnabled()) {
+        if (isLocationEnabled()) {
             mMap.isMyLocationEnabled = true
             subscribeForLocationChanging()
         }
@@ -86,7 +98,6 @@ class MapsActivity :
         super.onDestroy()
     }
 
-    // Запрос разрешений
     private fun requestStoragePermissions(): Boolean {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -95,12 +106,8 @@ class MapsActivity :
         ActivityCompat.requestPermissions(
             this,
             permissions,
-            resources.getInteger(R.integer.permission_storage_id)
+            0
         )
-
-        val builder = StrictMode.VmPolicy.Builder()
-        StrictMode.setVmPolicy(builder.build())
-
         return checkPermissions(permissions)
     }
 
@@ -112,14 +119,15 @@ class MapsActivity :
         ActivityCompat.requestPermissions(
             this,
             permissions,
-            resources.getInteger(R.integer.permission_location_id)
+            1
         )
         return checkPermissions(permissions)
     }
 
-    private fun checkPermissions(permissions: Array<String>): Boolean = permissions.fold(true) { acc, p ->
-        acc && ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun checkPermissions(permissions: Array<String>): Boolean =
+        permissions.fold(true) { acc, p ->
+            acc && ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED
+        }
 
     private fun subscribeForLocationChanging() {
         if (requestLocationPermissions()) {
@@ -128,8 +136,7 @@ class MapsActivity :
                 listenLocationChanging()
             } else {
                 notify("Location disabled")
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                startActivityForResult(intent, resources.getInteger(R.integer.location_req_code))
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
             }
         }
     }
@@ -146,12 +153,11 @@ class MapsActivity :
                     val target = Location("")
                     target.latitude = dot.getLatLng().latitude
                     target.longitude = dot.getLatLng().longitude
-                    if (locationResult.lastLocation.distanceTo(target) <=
-                        resources.getInteger(R.integer.ping_range)) {
+                    if (locationResult.lastLocation.distanceTo(target) <= 1000) {
                         nearest.add(dot)
                     }
                 }
-                notify("These markers are close with you: $nearest")
+                if (nearest.size != 0) notify("These markers are close with you: $nearest")
             }
         }
 
@@ -170,7 +176,7 @@ class MapsActivity :
     }
 
     private fun notify(msg: String) {
-        val toast = Toast.makeText(this,  msg, Toast.LENGTH_LONG)
+        val toast = Toast.makeText(this, msg, Toast.LENGTH_LONG)
         toast.setGravity(Gravity.TOP, 0, 0)
         toast.show()
     }
