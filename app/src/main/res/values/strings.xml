@@ -8,4 +8,6 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="capture">Capture</string>
+    <string name="state_image_key">image</string>
+    <string name="state_marker_key">marker</string>
 </resources>

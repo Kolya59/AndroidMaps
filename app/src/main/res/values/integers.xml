@@ -1,0 +1,8 @@
+<resources>
+    <integer name="marker_req_code">1</integer>
+    <integer name="location_req_code">2</integer>
+    <integer name="image_req_code">3</integer>
+    <integer name="permission_location_id">12</integer>
+    <integer name="permission_storage_id">13</integer>
+    <integer name="ping_range">1000</integer>
+</resources>
