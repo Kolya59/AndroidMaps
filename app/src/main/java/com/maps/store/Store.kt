@@ -15,24 +15,17 @@ class Store(context: Context) {
         mRealm = Realm.getDefaultInstance()
     }
 
-    fun close() {
-        if (checkConnectionOpening()) { mRealm.close() }
-    }
-
-    fun findAllMarkers(): RealmResults<Dot>? {
-        return if (checkConnectionOpening()) {
+    fun findAllMarkers(): RealmResults<Dot>? = if (checkConnectionOpening()) {
             mRealm.where(Dot::class.java).findAll()
         } else null
-    }
 
-    fun findMarker(position: LatLng?): Dot? {
-        return if (checkConnectionOpening() && position != null) {
+
+    fun findMarker(position: LatLng?): Dot? = if (checkConnectionOpening() && position != null) {
             mRealm.where(Dot::class.java)
                 .equalTo("lat", position.latitude)
                 .equalTo("lng", position.longitude)
                 .findFirst()
         } else null
-    }
 
     fun createMarker(position: LatLng) {
         if (!checkConnectionOpening()) {return}
@@ -55,7 +48,7 @@ class Store(context: Context) {
         }
     }
 
-    private fun checkConnectionOpening(): Boolean {
-        return !this.mRealm.isClosed
-    }
+    private fun checkConnectionOpening() = !this.mRealm.isClosed
+
+    fun close() { if (checkConnectionOpening()) { mRealm.close() } }
 }
